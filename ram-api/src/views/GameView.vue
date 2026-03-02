@@ -1,8 +1,16 @@
 <template>
   <div class="container">
-    <h2>Turnos: {{ turns }}</h2>
+    <header>
+      <h1>Adivina Quién</h1>
+      <p>Turno {{ turns }} | Preguntas hechas: {{ questionsCount }}</p>
+    </header>
 
-    <QuestionPanel @ask="handleQuestion" />
+    <QuestionPanel
+      v-if="canAsk"
+      @ask="handleQuestion"
+    />
+
+    <p v-else class="info">✔ Acción usada. Pasa al siguiente turno.</p>
 
     <div class="grid">
       <CharacterCard
@@ -10,11 +18,13 @@
         :key="char.id"
         :character="char"
         :discarded="discardedIds.includes(char.id)"
+        :selectable="canGuess"
+        @select="guess(char)"
       />
     </div>
 
-    <div v-if="remaining.length === 1" class="win">
-      🎉 ¡El personaje era {{ remaining[0].name }}!
+    <div v-if="gameOver" class="win">
+      🎉 ¡El personaje era {{ secret.name }}!
       <p>Turnos usados: {{ turns }}</p>
     </div>
   </div>
@@ -31,14 +41,18 @@ export default {
       characters: [],
       secret: null,
       discardedIds: [],
-      turns: 0
+      turns: 1,
+      questionsCount: 0,
+      actionUsed: false,
+      gameOver: false
     }
   },
   computed: {
-    remaining() {
-      return this.characters.filter(
-        c => !this.discardedIds.includes(c.id)
-      )
+    canAsk() {
+      return !this.actionUsed && !this.gameOver
+    },
+    canGuess() {
+      return !this.actionUsed && !this.gameOver
     }
   },
   async mounted() {
@@ -50,7 +64,8 @@ export default {
   },
   methods: {
     handleQuestion(q) {
-      this.turns++
+      this.questionsCount++
+      this.actionUsed = true
 
       const answer = this.secret[q.field] === q.value
 
@@ -62,21 +77,53 @@ export default {
           }
         }
       })
+
+      this.nextTurn()
+    },
+    guess(char) {
+      this.actionUsed = true
+
+      if (char.id === this.secret.id) {
+        this.gameOver = true
+      } else {
+        this.discardedIds.push(char.id)
+        this.nextTurn()
+      }
+    },
+    nextTurn() {
+      setTimeout(() => {
+        this.turns++
+        this.actionUsed = false
+      }, 600)
     }
   }
 }
 </script>
 
 <style scoped>
+.container {
+  padding: 1rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.info {
+  text-align: center;
+  color: #ccc;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: 10px;
 }
 
 .win {
   text-align: center;
+  font-size: 1.4rem;
   margin-top: 20px;
-  font-size: 1.3rem;
 }
 </style>
