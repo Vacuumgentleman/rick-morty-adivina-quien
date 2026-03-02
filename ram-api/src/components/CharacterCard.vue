@@ -6,7 +6,7 @@
   >
     <img :src="character.image" />
     <h4>{{ character.name }}</h4>
-    <div v-if="discarded" class="x">❌</div>
+    <div v-if="discarded" class="overlay">❌</div>
   </div>
 </template>
 
@@ -23,32 +23,40 @@ export default {
 <style scoped>
 .card {
   position: relative;
-  background: #1f2933;
-  color: white;
-  border-radius: 8px;
-  padding: 5px;
-  cursor: pointer;
+  background: #1b2631;
+  border-radius: 10px;
+  padding: 4px;
+  text-align: center;
   transition: transform 0.2s;
 }
 
 .card:hover {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
-.card img {
+img {
   width: 100%;
+  height: 95px;
+  object-fit: cover;
   border-radius: 6px;
 }
 
+h4 {
+  font-size: 0.65rem;
+  margin-top: 4px;
+}
+
 .discarded {
-  opacity: 0.25;
+  opacity: 0.3;
   pointer-events: none;
 }
 
-.x {
+.overlay {
   position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 1.3rem;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
 }
 </style>

@@ -4,16 +4,18 @@
       <h1>Adivina Quién</h1>
       <h2>Rick & Morty Edition</h2>
 
-      <button @click="$emit('play')">🎮 Jugar</button>
+      <router-link to="/game" class="play">
+        🎮 Jugar
+      </router-link>
 
-      <section class="how">
+      <section>
         <h3>¿Cómo jugar?</h3>
         <ul>
-          <li>🤖 La máquina elige un personaje secreto</li>
-          <li>❓ En cada turno puedes hacer una pregunta</li>
-          <li>🧠 O puedes intentar adivinar el personaje</li>
-          <li>❌ Los personajes incorrectos se descartan</li>
-          <li>🏆 Ganas cuando aciertas con el personaje</li>
+          <li>🤖 La IA elige un personaje secreto</li>
+          <li>❓ Haz una sola pregunta por turno</li>
+          <li>🧠 O intenta adivinar el personaje</li>
+          <li>❌ Los personajes descartados se marcan</li>
+          <li>🏆 Adivina en el menor número de turnos</li>
         </ul>
       </section>
     </div>
@@ -23,59 +25,53 @@
 <style scoped>
 .home {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: radial-gradient(circle, #0f2027, #203a43);
+  display: grid;
+  place-items: center;
 }
 
 .card {
-  background: #1b2631;
-  color: white;
+  background: #141a22;
   padding: 2rem;
-  border-radius: 16px;
+  border-radius: 20px;
   max-width: 420px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 0 25px rgba(0, 255, 234, 0.2);
+  box-shadow: 0 0 40px rgba(0, 255, 234, 0.15);
 }
 
 h1 {
-  color: #00ffea;
-  margin-bottom: 0;
+  color: #66fcf1;
+  margin-bottom: 0.3rem;
 }
 
 h2 {
   font-weight: normal;
-  margin-top: 0.2rem;
+  font-size: 1rem;
   margin-bottom: 1.5rem;
 }
 
-button {
-  background: #00ffea;
-  border: none;
-  padding: 12px 24px;
+.play {
+  display: inline-block;
+  background: #66fcf1;
+  color: #000;
+  padding: 14px 30px;
+  border-radius: 14px;
   font-size: 1.2rem;
-  border-radius: 10px;
-  cursor: pointer;
   margin-bottom: 1.5rem;
 }
 
-button:hover {
-  background: #00e0d0;
-}
-
-.how {
+section {
   text-align: left;
   font-size: 0.9rem;
 }
 
-.how h3 {
+section h3 {
   text-align: center;
-  color: #00ffea;
+  color: #66fcf1;
+  margin-bottom: 0.5rem;
 }
 
 ul {
-  padding-left: 1rem;
+  padding-left: 1.2rem;
 }
 </style>

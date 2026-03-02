@@ -1,10 +1,8 @@
 <template>
   <div class="panel">
-    <button @click="prev">⬅️</button>
-    <span>{{ questions[index].text }}</span>
-    <button @click="next">➡️</button>
-
-    <button class="ask" @click="ask">Preguntar</button>
+    <button v-for="q in questions" :key="q.text" @click="$emit('ask', q)">
+      {{ q.text }}
+    </button>
   </div>
 </template>
 
@@ -12,7 +10,6 @@
 export default {
   data() {
     return {
-      index: 0,
       questions: [
         { text: "¿Está vivo?", field: "status", value: "Alive" },
         { text: "¿Está muerto?", field: "status", value: "Dead" },
@@ -22,18 +19,6 @@ export default {
         { text: "¿Es alien?", field: "species", value: "Alien" }
       ]
     }
-  },
-  methods: {
-    next() {
-      this.index = (this.index + 1) % this.questions.length
-    },
-    prev() {
-      this.index =
-        (this.index - 1 + this.questions.length) % this.questions.length
-    },
-    ask() {
-      this.$emit("ask", this.questions[this.index])
-    }
   }
 }
 </script>
@@ -41,13 +26,22 @@ export default {
 <style scoped>
 .panel {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.ask {
-  margin-left: 10px;
+button {
+  background: #45a29e;
+  color: #000;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+button:hover {
+  background: #66fcf1;
 }
 </style>

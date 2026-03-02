@@ -1,16 +1,19 @@
 <template>
-  <div class="container">
+  <div class="game">
     <header>
-      <h1>Adivina Quién</h1>
-      <p>Turno {{ turns }} | Preguntas hechas: {{ questionsCount }}</p>
+      <router-link to="/" class="back">⬅ Inicio</router-link>
+      <h2>Adivina Quién</h2>
+      <p>Turno {{ turns }} · Preguntas {{ questionsCount }}</p>
     </header>
 
     <QuestionPanel
-      v-if="canAsk"
+      v-if="!actionUsed && !gameOver"
       @ask="handleQuestion"
     />
 
-    <p v-else class="info">✔ Acción usada. Pasa al siguiente turno.</p>
+    <p v-else-if="!gameOver" class="info">
+      Acción usada, pasando al siguiente turno…
+    </p>
 
     <div class="grid">
       <CharacterCard
@@ -18,14 +21,14 @@
         :key="char.id"
         :character="char"
         :discarded="discardedIds.includes(char.id)"
-        :selectable="canGuess"
+        :selectable="!actionUsed && !gameOver"
         @select="guess(char)"
       />
     </div>
 
     <div v-if="gameOver" class="win">
-      🎉 ¡El personaje era {{ secret.name }}!
-      <p>Turnos usados: {{ turns }}</p>
+      🎉 El personaje era <strong>{{ secret.name }}</strong><br />
+      Turnos usados: {{ turns }}
     </div>
   </div>
 </template>
@@ -47,14 +50,6 @@ export default {
       gameOver: false
     }
   },
-  computed: {
-    canAsk() {
-      return !this.actionUsed && !this.gameOver
-    },
-    canGuess() {
-      return !this.actionUsed && !this.gameOver
-    }
-  },
   async mounted() {
     const res = await fetch("https://rickandmortyapi.com/api/character")
     const data = await res.json()
@@ -69,11 +64,11 @@ export default {
 
       const answer = this.secret[q.field] === q.value
 
-      this.characters.forEach(char => {
-        const match = char[q.field] === q.value
+      this.characters.forEach(c => {
+        const match = c[q.field] === q.value
         if ((answer && !match) || (!answer && match)) {
-          if (!this.discardedIds.includes(char.id)) {
-            this.discardedIds.push(char.id)
+          if (!this.discardedIds.includes(c.id)) {
+            this.discardedIds.push(c.id)
           }
         }
       })
@@ -82,7 +77,6 @@ export default {
     },
     guess(char) {
       this.actionUsed = true
-
       if (char.id === this.secret.id) {
         this.gameOver = true
       } else {
@@ -94,36 +88,47 @@ export default {
       setTimeout(() => {
         this.turns++
         this.actionUsed = false
-      }, 600)
+      }, 500)
     }
   }
 }
 </script>
 
 <style scoped>
-.container {
+.game {
+  max-width: 1400px;
+  margin: auto;
   padding: 1rem;
 }
 
 header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 5px;
+  color: #66fcf1;
+  font-size: 0.9rem;
 }
 
 .info {
   text-align: center;
-  color: #ccc;
+  color: #aaa;
+  margin: 8px 0;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
   gap: 10px;
 }
 
 .win {
   text-align: center;
-  font-size: 1.4rem;
-  margin-top: 20px;
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  color: #66fcf1;
 }
 </style>
