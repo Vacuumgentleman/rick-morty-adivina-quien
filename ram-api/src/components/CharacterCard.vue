@@ -5,8 +5,8 @@
     @click="selectable && $emit('select')"
   >
     <img :src="character.image" />
-    <h4>{{ character.name }}</h4>
-    <div v-if="discarded" class="overlay">❌</div>
+    <span>{{ character.name }}</span>
+    <div v-if="discarded" class="overlay">✖</div>
   </div>
 </template>
 
@@ -23,40 +23,46 @@ export default {
 <style scoped>
 .card {
   position: relative;
-  background: #1b2631;
-  border-radius: 10px;
+  background: linear-gradient(180deg, #0b1c24, #050b10);
+  border: 1px solid rgba(57,255,20,0.25);
+  border-radius: 12px;
   padding: 4px;
   text-align: center;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
-  transform: scale(1.04);
+  transform: scale(1.06);
+  box-shadow: 0 0 15px rgba(57,255,20,0.35);
 }
 
 img {
   width: 100%;
-  height: 95px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-h4 {
-  font-size: 0.65rem;
+span {
+  display: block;
+  font-size: 0.62rem;
   margin-top: 4px;
 }
 
 .discarded {
-  opacity: 0.3;
+  opacity: 0.25;
+  filter: grayscale(1);
   pointer-events: none;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0,0,0,0.75);
   display: grid;
   place-items: center;
   font-size: 2rem;
+  color: var(--danger);
+  border-radius: 12px;
 }
 </style>

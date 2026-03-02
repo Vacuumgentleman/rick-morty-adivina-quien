@@ -1,9 +1,9 @@
 <template>
   <div class="game">
-    <header>
-      <router-link to="/" class="back">⬅ Inicio</router-link>
-      <h2>Adivina Quién</h2>
-      <p>Turno {{ turns }} · Preguntas {{ questionsCount }}</p>
+    <header class="hud">
+      <router-link to="/" class="back">← Exit Portal</router-link>
+      <h2>Portal Guess</h2>
+      <p>Turn {{ turns }} · Questions {{ questionsCount }}</p>
     </header>
 
     <QuestionPanel
@@ -12,7 +12,7 @@
     />
 
     <p v-else-if="!gameOver" class="info">
-      Acción usada, pasando al siguiente turno…
+      Processing reality shift…
     </p>
 
     <div class="grid">
@@ -27,8 +27,9 @@
     </div>
 
     <div v-if="gameOver" class="win">
-      🎉 El personaje era <strong>{{ secret.name }}</strong><br />
-      Turnos usados: {{ turns }}
+      <h3>PORTAL LOCKED</h3>
+      <p>The character was <strong>{{ secret.name }}</strong></p>
+      <p>Turns used: {{ turns }}</p>
     </div>
   </div>
 </template>
@@ -88,7 +89,7 @@ export default {
       setTimeout(() => {
         this.turns++
         this.actionUsed = false
-      }, 500)
+      }, 600)
     }
   }
 }
@@ -96,39 +97,48 @@ export default {
 
 <style scoped>
 .game {
-  max-width: 1400px;
+  max-width: 1500px;
   margin: auto;
   padding: 1rem;
 }
 
-header {
+.hud {
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.hud h2 {
+  color: var(--neon);
+}
+
+.hud p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .back {
   display: inline-block;
-  margin-bottom: 5px;
-  color: #66fcf1;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  color: var(--neon-soft);
+  margin-bottom: 4px;
 }
 
 .info {
   text-align: center;
-  color: #aaa;
-  margin: 8px 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
   gap: 10px;
 }
 
 .win {
   text-align: center;
-  margin-top: 1rem;
-  font-size: 1.3rem;
-  color: #66fcf1;
+  margin-top: 1.2rem;
+  color: var(--neon);
 }
 </style>

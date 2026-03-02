@@ -11,12 +11,12 @@ export default {
   data() {
     return {
       questions: [
-        { text: "¿Está vivo?", field: "status", value: "Alive" },
-        { text: "¿Está muerto?", field: "status", value: "Dead" },
-        { text: "¿Es hombre?", field: "gender", value: "Male" },
-        { text: "¿Es mujer?", field: "gender", value: "Female" },
-        { text: "¿Es humano?", field: "species", value: "Human" },
-        { text: "¿Es alien?", field: "species", value: "Alien" }
+        { text: "Alive?", field: "status", value: "Alive" },
+        { text: "Dead?", field: "status", value: "Dead" },
+        { text: "Male?", field: "gender", value: "Male" },
+        { text: "Female?", field: "gender", value: "Female" },
+        { text: "Human?", field: "species", value: "Human" },
+        { text: "Alien?", field: "species", value: "Alien" }
       ]
     }
   }
@@ -33,15 +33,17 @@ export default {
 }
 
 button {
-  background: #45a29e;
-  color: #000;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  border-radius: 10px;
+  background: rgba(57,255,20,0.15);
+  color: var(--neon);
+  border: 1px solid rgba(57,255,20,0.35);
+  transition: background 0.2s, transform 0.15s;
 }
 
 button:hover {
-  background: #66fcf1;
+  background: rgba(57,255,20,0.35);
+  transform: scale(1.05);
 }
 </style>

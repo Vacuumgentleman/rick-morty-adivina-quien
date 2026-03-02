@@ -1,23 +1,23 @@
 <template>
   <div class="home">
-    <div class="card">
-      <h1>Adivina Quién</h1>
-      <h2>Rick & Morty Edition</h2>
+    <div class="portal-card">
+      <h1>PORTAL GUESS</h1>
+      <h2>Rick & Morty</h2>
 
-      <router-link to="/game" class="play">
-        🎮 Jugar
+      <router-link to="/game" class="play-btn">
+        ENTER PORTAL
       </router-link>
 
-      <section>
-        <h3>¿Cómo jugar?</h3>
+      <div class="rules">
+        <h3>How to play</h3>
         <ul>
-          <li>🤖 La IA elige un personaje secreto</li>
-          <li>❓ Haz una sola pregunta por turno</li>
-          <li>🧠 O intenta adivinar el personaje</li>
-          <li>❌ Los personajes descartados se marcan</li>
-          <li>🏆 Adivina en el menor número de turnos</li>
+          <li>The AI chooses a secret character</li>
+          <li>You can ask only one question per turn</li>
+          <li>Or guess the character directly</li>
+          <li>Discard characters to narrow it down</li>
+          <li>Guess in the fewest turns possible</li>
         </ul>
-      </section>
+      </div>
     </div>
   </div>
 </template>
@@ -29,49 +29,66 @@
   place-items: center;
 }
 
-.card {
-  background: #141a22;
-  padding: 2rem;
-  border-radius: 20px;
-  max-width: 420px;
+.portal-card {
+  background: linear-gradient(
+    180deg,
+    rgba(11, 28, 36, 0.95),
+    rgba(5, 11, 16, 0.95)
+  );
+  border: 1px solid rgba(57,255,20,0.35);
+  border-radius: 22px;
+  padding: 2.5rem 2.2rem;
   width: 90%;
+  max-width: 460px;
   text-align: center;
-  box-shadow: 0 0 40px rgba(0, 255, 234, 0.15);
+  box-shadow:
+    0 0 40px rgba(57,255,20,0.25),
+    inset 0 0 25px rgba(57,255,20,0.08);
 }
 
 h1 {
-  color: #66fcf1;
-  margin-bottom: 0.3rem;
+  color: var(--neon);
+  font-size: 2.2rem;
 }
 
 h2 {
-  font-weight: normal;
   font-size: 1rem;
-  margin-bottom: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1.8rem;
+  color: var(--text-muted);
 }
 
-.play {
+.play-btn {
   display: inline-block;
-  background: #66fcf1;
-  color: #000;
-  padding: 14px 30px;
+  margin-bottom: 1.8rem;
+  padding: 14px 34px;
   border-radius: 14px;
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 600;
+  background: radial-gradient(circle, var(--neon), var(--neon-soft));
+  color: #00140a;
+  box-shadow: 0 0 20px rgba(57,255,20,0.7);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-section {
+.play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(57,255,20,0.9);
+}
+
+.rules {
   text-align: left;
   font-size: 0.9rem;
 }
 
-section h3 {
+.rules h3 {
   text-align: center;
-  color: #66fcf1;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  color: var(--neon-soft);
 }
 
-ul {
-  padding-left: 1.2rem;
+.rules ul {
+  padding-left: 1.1rem;
+  color: var(--text-muted);
 }
 </style>
