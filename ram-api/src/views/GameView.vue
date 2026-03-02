@@ -1,36 +1,80 @@
 <template>
   <div class="game">
-    <header class="hud">
-      <router-link to="/" class="back">← Exit Portal</router-link>
-      <h2>Portal Guess</h2>
-      <p>Turn {{ turns }} · Questions {{ questionsCount }}</p>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <router-link to="/" class="nav-back">⟵ Exit</router-link>
+
+      <div class="nav-title">
+        <h1>Portal Guess</h1>
+        <span>Rick & Morty</span>
+      </div>
+
+      <div class="nav-stats">
+        <div>
+          <strong>{{ turns }}</strong>
+          <small>Turns</small>
+        </div>
+        <div>
+          <strong>{{ questionsCount }}</strong>
+          <small>Questions</small>
+        </div>
+      </div>
     </header>
 
-    <QuestionPanel
-      v-if="!actionUsed && !gameOver"
-      @ask="handleQuestion"
-    />
+    <!-- CONTENT -->
+    <main class="content">
+      <div class="layout">
 
-    <p v-else-if="!gameOver" class="info">
-      Processing reality shift…
-    </p>
+        <!-- BOARD -->
+        <section class="board">
+          <CharacterCard
+            v-for="c in characters"
+            :key="c.id"
+            :character="c"
+            :discarded="discardedIds.includes(c.id)"
+            :selectable="!actionUsed && !gameOver"
+            @select="guess(c)"
+          />
+        </section>
 
-    <div class="grid">
-      <CharacterCard
-        v-for="char in characters"
-        :key="char.id"
-        :character="char"
-        :discarded="discardedIds.includes(char.id)"
-        :selectable="!actionUsed && !gameOver"
-        @select="guess(char)"
-      />
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+          <QuestionPanel
+            :disabled="actionUsed || gameOver"
+            @ask="handleQuestion"
+          />
+        </aside>
+
+      </div>
+    </main>
+
+    <!-- WIN MODAL -->
+    <div v-if="gameOver" class="overlay">
+      <div class="modal">
+        <h2>🌀 You guessed it!</h2>
+
+        <div class="results">
+          <div>
+            <strong>{{ questionsCount }}</strong>
+            <span>Questions</span>
+          </div>
+          <div>
+            <strong>{{ turns }}</strong>
+            <span>Turns</span>
+          </div>
+          <div class="score">
+            <strong>{{ score }}</strong>
+            <span>Score</span>
+          </div>
+        </div>
+
+        <button class="portal-btn" @click="restart">
+          🧪 Jump into another portal
+        </button>
+      </div>
     </div>
 
-    <div v-if="gameOver" class="win">
-      <h3>PORTAL LOCKED</h3>
-      <p>The character was <strong>{{ secret.name }}</strong></p>
-      <p>Turns used: {{ turns }}</p>
-    </div>
   </div>
 </template>
 
@@ -51,22 +95,50 @@ export default {
       gameOver: false
     }
   },
+  computed: {
+    score() {
+      const raw = 1000 - (this.questionsCount * 40 + this.turns * 20)
+      return Math.max(0, raw)
+    }
+  },
   async mounted() {
-    const res = await fetch("https://rickandmortyapi.com/api/character")
-    const data = await res.json()
-    this.characters = data.results
-    this.secret =
-      this.characters[Math.floor(Math.random() * this.characters.length)]
+    await this.loadGame()
   },
   methods: {
+    async loadGame() {
+      const page = Math.floor(Math.random() * 42) + 1
+      const res = await fetch(
+        `https://rickandmortyapi.com/api/character?page=${page}`
+      )
+      const data = await res.json()
+
+      this.characters = data.results
+        .filter(c => c.image)
+        .slice(0, 20)
+
+      this.secret =
+        this.characters[Math.floor(Math.random() * this.characters.length)]
+    },
+
     handleQuestion(q) {
       this.questionsCount++
       this.actionUsed = true
 
-      const answer = this.secret[q.field] === q.value
+      const answer =
+        q.field === "episode.length"
+          ? this.secret.episode.length > 1
+          : q.field.includes(".")
+            ? q.field.split(".").reduce((o, k) => o?.[k], this.secret) === q.value
+            : this.secret[q.field] === q.value
 
       this.characters.forEach(c => {
-        const match = c[q.field] === q.value
+        const match =
+          q.field === "episode.length"
+            ? c.episode.length > 1
+            : q.field.includes(".")
+              ? q.field.split(".").reduce((o, k) => o?.[k], c) === q.value
+              : c[q.field] === q.value
+
         if ((answer && !match) || (!answer && match)) {
           if (!this.discardedIds.includes(c.id)) {
             this.discardedIds.push(c.id)
@@ -74,71 +146,234 @@ export default {
         }
       })
 
-      this.nextTurn()
-    },
-    guess(char) {
-      this.actionUsed = true
-      if (char.id === this.secret.id) {
-        this.gameOver = true
-      } else {
-        this.discardedIds.push(char.id)
-        this.nextTurn()
-      }
-    },
-    nextTurn() {
       setTimeout(() => {
         this.turns++
         this.actionUsed = false
-      }, 600)
+      }, 400)
+    },
+
+    guess(c) {
+      this.actionUsed = true
+
+      if (c.id === this.secret.id) {
+        this.gameOver = true
+      } else {
+        this.discardedIds.push(c.id)
+      }
+
+      setTimeout(() => {
+        this.turns++
+        this.actionUsed = false
+      }, 400)
+    },
+
+    async restart() {
+      this.characters = []
+      this.secret = null
+      this.discardedIds = []
+      this.turns = 1
+      this.questionsCount = 0
+      this.actionUsed = false
+      this.gameOver = false
+
+      await this.loadGame()
     }
   }
 }
 </script>
 
 <style scoped>
-.game {
-  max-width: 1500px;
-  margin: auto;
-  padding: 1rem;
+/* ===== NAVBAR ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 72px;
+  padding: 0 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #02131c, #031f2d);
+  border-bottom: 1px solid rgba(0,255,170,.35);
 }
 
-.hud {
+.nav-back {
+  color: #00ffb3;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-title h1 {
+  color: #00ffb3;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.nav-title span {
+  font-size: .7rem;
+  color: #8affdc;
+}
+
+.nav-stats {
+  display: flex;
+  gap: 14px;
+}
+
+.nav-stats div {
   text-align: center;
-  margin-bottom: 0.8rem;
 }
 
-.hud h2 {
-  color: var(--neon);
+.nav-stats strong {
+  color: #00ffb3;
 }
 
-.hud p {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.back {
-  display: inline-block;
-  font-size: 0.8rem;
-  color: var(--neon-soft);
-  margin-bottom: 4px;
-}
-
-.info {
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.grid {
+/* ===== LAYOUT ===== */
+.layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
 }
 
-.win {
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.sidebar {
+  position: sticky;
+  top: 88px;
+  background: #050e13;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+/* ===== MODAL ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #071a24;
+  border-radius: 16px;
+  padding: 26px;
+  width: 320px;
   text-align: center;
-  margin-top: 1.2rem;
-  color: var(--neon);
+  animation: pop .25s ease;
+}
+
+.modal h2 {
+  color: #00ffb3;
+  margin-bottom: 18px;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.results div {
+  background: #020c12;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.results span {
+  font-size: .7rem;
+  color: #7eeed1;
+}
+
+.score strong {
+  color: #00ffb3;
+  font-size: 1.4rem;
+}
+
+/* ===== PORTAL BUTTON ===== */
+.portal-btn {
+  position: relative;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 800;
+  font-size: .95rem;
+  letter-spacing: .4px;
+  color: #012019;
+  background: radial-gradient(
+    circle at top left,
+    #7dffe1,
+    #00ffb3 60%
+  );
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow:
+    0 0 12px rgba(0,255,179,.6),
+    0 0 32px rgba(0,255,179,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.portal-btn::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255,255,255,.7),
+    transparent 70%
+  );
+  opacity: .35;
+  animation: portalSpin 2.5s linear infinite;
+}
+
+.portal-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 0 18px rgba(0,255,179,.9),
+    0 0 40px rgba(0,255,179,.6);
+}
+
+.portal-btn:active {
+  transform: scale(.97);
+}
+
+@keyframes portalSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pop {
+  from { transform: scale(.85); opacity: 0 }
+  to { transform: scale(1); opacity: 1 }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .board {
+    margin-bottom: 260px;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 </style>
