@@ -1,24 +1,22 @@
 <template>
-  <SetupView v-if="stage === 'setup'" @start="startGame" />
-  <GameView v-else :playerCharacter="playerCharacter" />
+  <HomeView v-if="screen === 'home'" @play="startGame" />
+  <GameView v-else />
 </template>
 
 <script>
-import SetupView from "./views/SetupView.vue"
+import HomeView from "./views/HomeView.vue"
 import GameView from "./views/GameView.vue"
 
 export default {
-  components: { SetupView, GameView },
+  components: { HomeView, GameView },
   data() {
     return {
-      stage: "setup",
-      playerCharacter: null
+      screen: "home"
     }
   },
   methods: {
-    startGame(character) {
-      this.playerCharacter = character
-      this.stage = "game"
+    startGame() {
+      this.screen = "game"
     }
   }
 }

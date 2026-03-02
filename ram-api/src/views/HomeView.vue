@@ -1,114 +1,81 @@
 <template>
-  <div class="container">
-    <h1>Adivina el Personaje 🕵️‍♂️</h1>
+  <div class="home">
+    <div class="card">
+      <h1>Adivina Quién</h1>
+      <h2>Rick & Morty Edition</h2>
 
-    <!-- BOTONES DE PREGUNTAS -->
-    <div class="filters">
-      <button @click="filterByStatus('Alive')">¿Está vivo?</button>
-      <button @click="filterBySpecies('Human')">¿Es humano?</button>
-      <button @click="filterByGender('Male')">¿Es hombre?</button>
-      <button class="reset" @click="resetGame">Reiniciar</button>
-    </div>
+      <button @click="$emit('play')">🎮 Jugar</button>
 
-    <p v-if="loading">Cargando personajes...</p>
-
-    <div class="grid" v-if="!loading">
-      <CharacterCard
-        v-for="character in characters"
-        :key="character.id"
-        :character="character"
-        @guess="makeGuess"
-      />
+      <section class="how">
+        <h3>¿Cómo jugar?</h3>
+        <ul>
+          <li>🤖 La máquina elige un personaje secreto</li>
+          <li>❓ En cada turno puedes hacer una pregunta</li>
+          <li>🧠 O puedes intentar adivinar el personaje</li>
+          <li>❌ Los personajes incorrectos se descartan</li>
+          <li>🏆 Ganas cuando aciertas con el personaje</li>
+        </ul>
+      </section>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import CharacterCard from '../components/CharacterCard.vue'
-
-const characters = ref([])
-const secretCharacter = ref(null)
-const loading = ref(true)
-
-onMounted(async () => {
-  const res = await fetch('https://rickandmortyapi.com/api/character')
-  const data = await res.json()
-  characters.value = data.results
-
-  const random = Math.floor(Math.random() * characters.value.length)
-  secretCharacter.value = characters.value[random]
-
-  loading.value = false
-})
-
-function filterByStatus(value) {
-  const answer = secretCharacter.value.status === value
-  characters.value = characters.value.filter(
-    c => (c.status === value) === answer
-  )
-}
-
-function filterBySpecies(value) {
-  const answer = secretCharacter.value.species === value
-  characters.value = characters.value.filter(
-    c => (c.species === value) === answer
-  )
-}
-
-function filterByGender(value) {
-  const answer = secretCharacter.value.gender === value
-  characters.value = characters.value.filter(
-    c => (c.gender === value) === answer
-  )
-}
-
-function makeGuess(character) {
-  if (character.id === secretCharacter.value.id) {
-    alert('🎉 ¡Ganaste!')
-  } else {
-    alert('❌ Intenta de nuevo')
-  }
-}
-
-function resetGame() {
-  window.location.reload()
-}
-</script>
-
 <style scoped>
-.container {
-  padding: 20px;
+.home {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle, #0f2027, #203a43);
+}
+
+.card {
+  background: #1b2631;
+  color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(0, 255, 234, 0.2);
 }
 
 h1 {
-  text-align: center;
+  color: #00ffea;
+  margin-bottom: 0;
 }
 
-.filters {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+h2 {
+  font-weight: normal;
+  margin-top: 0.2rem;
+  margin-bottom: 1.5rem;
 }
 
-.filters button {
-  padding: 8px 14px;
-  border-radius: 8px;
+button {
+  background: #00ffea;
   border: none;
-  background: #4caf50;
-  color: white;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 10px;
   cursor: pointer;
+  margin-bottom: 1.5rem;
 }
 
-.reset {
-  background: #f44336;
+button:hover {
+  background: #00e0d0;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+.how {
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.how h3 {
+  text-align: center;
+  color: #00ffea;
+}
+
+ul {
+  padding-left: 1rem;
 }
 </style>
